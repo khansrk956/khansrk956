@@ -8,12 +8,13 @@ from . models import User
 def add_show(request):
     if request.method == "POST":
         fm = StudentRegistration(request.POST)
+        
         # First way to save data in database.
         # if fm.is_valid():
         #     fm.save()
 
         # second way to save data in database.
-        msg='Data Inserted successfully'
+        
         if fm.is_valid():
             nm = fm.cleaned_data['name']
             em = fm.cleaned_data['email']
@@ -25,8 +26,7 @@ def add_show(request):
     else:
         fm = StudentRegistration()
     stu = User.objects.all()
-    msg="Record Inserted Successfully..."
-    return render(request,'enroll/addORshow.html',{'form':fm,'stu':stu,'msg':msg})
+    return render(request,'enroll/addORshow.html',{'form':fm,'stu':stu})
 
 # delete data from database.
 
@@ -40,4 +40,14 @@ def del_data(request,id):
 # update data.
 
 def update_data(request,id):
-    return render(request,'enroll/update.html', {'id':id})
+    if request.method == "POST":
+        d = User.objects.get(pk=id)
+        fm = StudentRegistration(request.POST, instance=d)
+        if fm.is_valid():
+            fm.save()
+            return redirect('/')
+    else:
+        d = User.objects.get(pk=id) 
+        fm = StudentRegistration(instance=d)
+
+    return render(request,'enroll/update.html', {'fm':fm})
